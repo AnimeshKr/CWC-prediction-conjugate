@@ -1,0 +1,12 @@
+load input_noCov.mat;
+load output_south.mat;
+X_init = X;
+X = X - repmat( mean(X), size(X,1), 1 );
+X = X ./ repmat( std(X), size(X,1), 1 );
+y = y - repmat( mean(y), size(y,1), 1 );
+y = y ./ repmat( std(y), size(y,1), 1 );
+cov = (X'*y);
+cov = mean(cov,2);
+cov = abs(cov);
+X = X_init(:, abs(cov) > 0.4*mean(cov));
+save('input_cov.mat','X');

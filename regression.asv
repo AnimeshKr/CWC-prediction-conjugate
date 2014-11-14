@@ -1,0 +1,39 @@
+clear;
+clc;
+tic;
+load input_noCov.mat;
+load output_south.mat;
+disp('loaded data');
+initAvg = mean(X);
+X = X - repmat( initAvg, size(X,1), 1 );
+initRan = 2*std(X);
+X = X ./ repmat( initRan, size(X,1), 1 );
+X = pca(X,0.9999);
+
+init_features = size(X,2);
+for i = 1:init_features,
+    for j = i:init_features,
+        X = [ X X(:,i).*X(:,j) ]; 
+    end
+end
+
+X = [X ones(size(X,1),1)];
+disp('created final feature set');
+origX = X;
+
+parfor predictionYear = 2005:2012,
+    
+    Xtest = origX();
+    ytest = origX();
+    X();
+    
+    mdl = regress(y, X, 'linear');
+    disp('completed regression');
+
+    predicted = Xtest * mdl;
+    error = mean( abs( predicted - ytest ) * 100 ./ mean(origY) );
+    disp(['error in ' num2str(predictionYear) ' is ' num2str(error)]);
+end
+
+t = toc;
+disp(['took ' num2str(t) ' seconds']);
